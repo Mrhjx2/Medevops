@@ -1,0 +1,102 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+	<link rel="stylesheet" href="{% static 'plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+
+{% block content %}
+
+	<!-- main content -->
+	<section class="content">
+		<div class="box">
+			<div class="box-header">
+				<h3 class="box-title">组织架构信息</h3>
+			</div>
+			<div class="box-body">
+				<table id="example2" class="table table-bordered table-hover">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>组织架构</th>
+						<th>类型</th>
+						<th>所属</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for structure in structure_all %}
+						<tr>
+						<td>{{ structure.id }}</td>
+						<td>{{ structure.name }}</td>
+						<td>{{ structure.get_type_display }}</td>
+						<td>{{ structure.parent.name }}</td>
+						<td></td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="box">
+			<div class="box-header">
+				<h3 class="box-title">用户信息</h3>
+			</div>
+			<div class="box-header">
+				<div class="btn-group pull-left">
+					<a href="{% url 'system:testview1' gender='male' %}">
+						<button type="button" class="btn btn-default">男</button>
+					</a>
+				</div>
+				<div class="btn-group pull-left">
+					<a href="{% url 'system:testview1' gender='female' %}">
+						<button type="button" class="btn btn-default">女</button>
+					</a>
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body">
+				<table id="example2" class="table table-bordered table-hover">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>用户名</th>
+						<th>手机号码</th>
+						<th>邮箱</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for user in user_all %}
+						<tr>
+						<td>{{ user.id }}</td>
+						<td>{{ user.name }}</td>
+						<td>{{ user.gender }}</td>
+						<td>{{ user.username }}</td>
+						<td>{{ user.mobile }}</td>
+						<td>{{ user.email }}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<!-- /.box-body -->
+		</div>
+		<!-- /.box-->
+	</section>
+{% endblock %}
+
+{% block javascripts %}
+	<script src="{% static 'plugins/datatables/dataTables.bootstrap.js' %}"></script>
+	/*
+	这里重写了ListView中的get_queryset()方法，通过动态URL形式，来获取URL中变量gender的值，
+	然后get_queryset()中自定义的查询方法来查找数据。
+	在项目中这种数据查询过略的功能，更多使用的是ajax方式进行提交查询的，动态过滤也是Django比较常用的方法，可以了解下。
+	3.5 作业
+	在3.4中实现的动态过滤中，只有男，女两个性别，所以过滤的按钮和对应的url都是写死的，
+	如果过滤的字段有数十个甚至更多指，例如我想过滤UserProfile模型中的部门（department），
+	该如何实现？部门（department）字段是通过外键关联到组织架构（Structure）模型的，
+	试着去创建多个组织架构然后来动手实现上面的过滤功能。
+	*/
+{% endblock %}

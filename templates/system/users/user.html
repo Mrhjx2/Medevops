@@ -1,0 +1,419 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+	<link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+	<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+  <section class="content">
+	<div id="devlist">
+		<div class="box box-primary" id="liebiao">
+			<div class="box-header">
+				<div class="btn-group pull-left">
+					<button type="button" id="btnRefresh" class="btn btn-default">
+						<i class="glyphicon glyphicon-repeat"></i>刷新
+					</button>
+				</div>
+				<div class="btn-group pull-left">&nbsp</div>
+				<div class="btn-group pull-left">
+					<button type="button" id="btnCreate" class="btn btn-default">
+						<i class="glyphicon glyphicon-plus"></i>新增
+					</button>
+				</div>
+				<div class="btn-group pull-left">&nbsp</div>
+				<div class="btn-group pull-left">
+					<button type="button" id="btnDelete" class="btn btn-default">
+						<i class="glyphicon glyphicon-trash"></i>删除
+					</button>
+				</div>
+				<div class="btn-group pull-left">&nbsp</div>
+				<div class="btn-group pull-left">
+					<button type="button" id="btnEnable" class="btn btn-default">
+						<i class="glyphicon glyphicon-ok-circle"></i>启用
+					</button>
+					<button type="button" id="btnDisable" class="btn btn-default">
+						<i class="glyphicon glyphicon-ban-circle"></i>禁用
+					</button>
+				</div>
+				<div class="btn-group pull-right">
+					<form class="form-inline">
+						<div class="form-group">
+							<label>用户状态：</label>
+							<select id="select" name="select" class="form-control">
+								<option style="text-align:center" value="">-----所有-----</option>
+								<option value="True">启用</option>
+								<option value="False">禁用</option>
+							</select>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!--table-->
+			<div class="box-body">
+				<table id="dtbList" class="display" cellpadding="0" width="100%">
+					<thead>
+					<tr valign="middle">
+						<th><input type="checkbox" id="checkAll"></th>
+						<th>ID</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>手机</th>
+						<th>邮箱</th>
+						<th>部门</th>
+						<th>职位</th>
+						<th>上级</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+				<br> <br>
+			</div>
+
+		<!---->
+		</div>
+	</div>
+
+  </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+
+{% block javascripts %}
+	<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+	<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+
+	<script type="text/javascript">
+	var oDataTable = null;
+	$(function () {
+		oDataTable = initTable();
+
+		function initTable() {
+			var oTable = $("#dtbList").DataTable($.extend(true, {},
+				DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+				{
+				  ajax: {
+				    "url": "{% url 'system:basic-user-list' %}",
+						//帅选禁用和启用的用户
+						"data": function (d) {
+							d.select = $("#select").val();
+            }
+					},
+					columns: [
+					    DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
+						{
+						  data: "id",
+							width: "5%",
+						},
+						{
+						  data: "name", //parent
+							width: "10%",
+						},
+						{
+						  data: "gender",
+							width: "10%",
+							render: function (data, type,row, mata) {
+								if (data == 'male') {
+								  return "男";
+								} else {
+								  return "女";
+								}
+              }
+						},
+						{
+						  data: "mobile",
+						},
+						{
+						  data: "email",
+						},
+						{
+						  data: "department__name",
+						},
+						{
+						  data: "post",
+						},
+						{
+						  data: "superior__name",
+						},
+						{
+						  data: "is_active",
+							render: function (data) {
+								if (data == true) {
+								  return "启用";
+								} else {
+								  return "禁用";
+								}
+              }
+						},
+						{
+						  data: "id",
+							width: "12%",
+							bSortable: "false",
+							render: function (data, type, row, meta) {
+								var ret = "";
+								var ret = "<button titl='详情-编辑' onclick='doUpdate(" + data + ")'>" +
+										"<i class='glyphicon glyphicon-pencil'></i></button>";
+								ret = ret + "<button name='btnChangepasswd' title='修改密码' onclick='doChangepasswd("+ data + ")'>" +
+										"<i class='glyphicon glyphicon-asterisk'></i></button>";
+								ret = ret + "<button name='btnConfig' title='删除' onclick='doDelete("+ data +")'>" +
+										"<i class='glyphicon glyphicon-trash'></i></button>";
+								return ret;
+              }
+						}],
+					"order": [
+					    [2, 'desc']
+					],
+				}));
+			return oTable;
+  	}
+	});
+	{#	我们在初始化datatables配置的js中写到：#}
+	{#ajax: {#}
+	{#    "url": "{% url 'system:basic-user-list' %}",#}
+	{#v#}
+	{#1、通过ajax请求/system/base/user/userlist接口来获取数据；#}
+	{#2、{% url 'system:basic-user-list' %}： 是使用了DJANGO URL的反向解析功能，避免URL的硬编码，URL变更，不会影响到模板中的URL解析#}
+	{#3、在django后台也可以使用reverse()函数来进行URL的反响解析，实际上我们在用户登出的LogoutView视图已经使用到了reverse()函数#}
+	{#4、columns：datatables的一个属性方法，用来将通过ajax获取到的json数据渲染到表格中去，其中data指定的字段需和后台传递过来的数据字段名称一致，并和html中定义的表头顺寻一致#}
+
+	// 新增
+	$("#btnCreate").click(function () {
+		var div = layer.open({
+			type: 2,
+			title: "新增用户",
+			shadeClose: false,
+			maxmin: true,
+			area: ['800px','720px'],
+			content: "/system/basic/user/create",
+			end: function () {
+				// 关闭时做的事情
+				oDataTable.ajax.reload();
+      }
+  	});
+		//layer.full(div)
+  });
+
+	//account detail page
+	function doUpdate(id) {
+		var div = layer.open({
+			type: 2,
+			title: '编辑',
+			shadeClose: false,
+			maxmin: true,
+			area: ['800px','650px'],
+			content: ["{% url 'system:basic-user-detail' %}" + '?id=' + id, 'no'],
+			end: function () {
+				oDataTable.ajax.reload();
+      }
+		});
+		//layer.full(div)
+  }
+
+  // change password
+	function doChangepasswd(id) {
+		layer.open({
+			type: 2,
+			title: '修改密码',
+			shadeClose: false,
+			maxmin: true,
+			area: ['850px', '350px'],
+			content: ["{% url 'system:basic-user-password_change' %}" + '?id=' + id, 'no'],
+			end: function () {
+				oDataTable.ajax.reload();
+      }
+		});
+  }
+
+  //checkbox全选
+	$("#checkAll").on("click", function () {
+		if ($(this).prop("checked") === true) {
+		  $("input[name='checkList']").prop("checked", $(this).prop("checked"));
+		  $('#example tbody tr').addClass('selected');
+		} else {
+		  $("input[name='checkList']").prop("checked", false);
+		  $('#example tbody tr').removeClass('selected')
+		}
+  });
+
+	//批量删除
+	$("#btnDelete").click(function () {
+		if($("input[name='checkList']:checked").length == 0 ){
+		  layer.msg("请选择要删除的用户");
+		  return;
+		}
+
+		var arrId = new Array();
+		$("input[name='checkList']:checked").each(function () {
+		  //alter($(this).val());
+			arrId.push($(this).val());
+    });
+
+		sId = arrId.join(',');
+
+		layer.alert('确定删除吗?', {
+		  title: '提示',
+			icon: 3, //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+			time: 0, //不自动关闭
+			btn: ['YES', 'NO'],
+			yes: function (index) {
+				layer.close(index);
+				$.ajax({
+					type: "POST",
+					url: "{% url 'system:basic-user-delete' %}",
+					data: {"id": sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+					cache: false,
+					success: function (msg) {
+						if (msg.result) {
+						  layer.alert('删除成功');
+						  oDataTable.ajax.reload();
+						} else {
+						  layer.alert("删除失败");
+						}
+						return;
+          }
+				});
+      }
+		});
+  });
+
+	//批量启用
+	$("#btnEnable").click(function () {
+		if ($("input[name='checkList']:checked").length == 0) {
+		  layer.msg("请选择要启用的用户");
+		  return;
+		}
+
+		var arrId = new Array();
+		$("input[name='checkList']:checked").each(function () {
+		  //alert($(this).val())
+			arrId.push($(this).val());
+    });
+
+		sId = arrId.join(',');
+
+		layer.alert("确认启用吗?", {
+		  title: '提示',
+			icon: 3,
+			time: 0,
+			btn: ['YES', 'NO'],
+			yes: function (index) {
+				layer.close(index);
+				$.ajax({
+					type: "POST",
+					url: "{% url 'system:basic-user-enable' %}",
+					data: {"id": sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+					cache: false,
+					success: function (msg) {
+						if (msg.result) {
+						  layer.alert("启用用户成功", {icon: 1});
+						  oDataTable.ajax.reload();
+						} else {
+						  layer.alert("启用用户失败", {icon: 5});
+						}
+						return;
+          }
+				});
+      }
+		});
+  });
+
+	//批量禁用
+	$("#btnDisable").click(function () {
+		if ($("input[name='checkList']:checked").length == 0 ) {
+		  layer.msg("请选择要禁用的用户");
+		  return;
+		}
+
+		var arrId = new Array();
+		$("input[name='checkList']:checked").each(function () {
+			arrId.push($(this).val());
+    });
+
+		sId = arrId.join(',');
+
+		layer.alert('确定禁用吗?', {
+		  title: '提示',
+			icon: 2,
+			time: 0,
+			btn: ['YES', 'NO'],
+			yes: function (index) {
+				layer.close(index);
+				$.ajax({
+					type: "POST",
+					url: "{% url 'system:basic-user-disable' %}",
+					data: {"id": sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+					cache: false,
+					success: function (msg) {
+						if (msg.result) {
+						  layer.alert("禁用用户成功", {icon: 1});
+						  oDataTable.ajax.reload();
+						} else {
+						  layer.alert("禁用用户失败", {icon: 5});
+						}
+						return;
+          }
+				});
+      }
+		});
+  });
+
+	//删除单个用户
+	function doDelete(id) {
+	  layer.alert('确定删除用户吗', {
+	    title: '提示',
+			icon: 3,
+			time: 0,
+			btn: ['YES', 'NO'],
+			yes: function (index) {
+				layer.close(index);
+				$.ajax({
+					type: "POST",
+					url: "{% url 'system:basic-user-delete' %}",
+					data: {"id": id, csrfmiddlewaretoken: '{{ csrf_token }}'}, //防止post数据时报 csrf_token 403
+					cache: false,
+					success: function (msg) {
+						if (msg.result) {
+						  layer.alert('删除成功', {icon: 1});
+						  oDataTable.ajax.reload();
+						} else {
+						  layer.alert('删除失败', {icon: 5});
+						}
+						return;
+          }
+				});
+      }
+		});
+	}
+
+  /**
+	 * 项目中大部分操作都是通过jquery-ajax和后端进行交互的，
+	 * 这里只需要掌握项目中的几种常用写法，在使用的时候会套用即可，
+	 * 当然如果你对jquery感兴趣，可以深入学习下。运行项目，访问用户管理页就可以对用户进行批量删除、
+	 * 启用、停用操作了，你也可以通过表格中最后一列删除按钮来删除单个用户。
+   */
+
+  $("#select").change(function () {
+    //alert($("#select").val())
+		oDataTable.ajax.reload();
+  });
+  /**
+  * 这样我们只要在用户状态框中选中用户状态，通过$("#select").change()方法
+  * 监控到select状态变化了刷新datatables，这样datatables就通过ajax重新去
+  * 用列表接口请求数据，同时传递select值，后端视图接收到请求，
+  * 获取request.GET['select']值，通过filter查询返回数据结果。
+  *
+	 */
+
+	</script>
+
+{% endblock %}
