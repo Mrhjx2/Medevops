@@ -32,6 +32,7 @@
 							<th><input type="checkbox" id="checkAll"/></th>
 							<th>ID</th>
 							<th>名称</th>
+							<th>编号</th>
 							<th>代码</th>
 							<th>URL</th>
 							<th>图标</th>
@@ -71,6 +72,7 @@
 				{
 				  "id": "{{ menu.id }}",
 				  "name": "{{ menu.name }}",
+					"number": "{{ menu.number | default_if_none:'' }}",
 				  "code": "{{ menu.code }}",
 				  "url": "{{ menu.url | default_if_none:'' }}",
 				  "icon": "{{ menu.icon | default_if_none:'' }}",
@@ -95,6 +97,9 @@
 								},
 								{
 								  data: "name",
+								},
+								{
+								  data: "number",
 								},
 								{
 								  data: "code",
@@ -163,4 +168,5 @@
     }
 
 	</script>
+
 {% endblock %}

@@ -17,6 +17,7 @@ class Menu(models.Model):
     icon = models.CharField(max_length=50, null=True, blank=True, verbose_name="图标")
     code = models.CharField(max_length=50, null=True, blank=True, verbose_name="编码")
     url = models.CharField(max_length=128, unique=True, null=True, blank=True)
+    number = models.FloatField(null=True, blank=True,verbose_name="编号")
 
     def __str__(self):
         return self.name
@@ -24,11 +25,15 @@ class Menu(models.Model):
     class Meta:
         verbose_name = '菜单'
         verbose_name_plural = verbose_name
+        ordering = ['number']
         # abstract = True
 
     @classmethod
     def get_menu_by_request_url(cls, url):
-        return dict(menu=Menu.objects.get(url=url))
+        try:
+            return dict(menu=Menu.objects.get(url=url))
+        except:
+            return None
 
 
 class Role(models.Model):
