@@ -21,6 +21,8 @@ from django.db.models import Q
 from .forms import LoginForm, UserCreateForm, UserUpdateForm, PasswordchangeForm
 from .mixin import LoginRequiredMixin
 from system.models import Structure, Role
+from apps.custom import BreadcrumbMixin
+
 User = get_user_model()
 
 
@@ -35,6 +37,8 @@ class IndexView(LoginRequiredMixin, View):
     #     return super(IndexView, self).dispatch(*args, **kwargs)
 
     def get(self, request):
+        # print(request.top_menu)
+
         return render(request, 'index.html')
 
 
@@ -78,7 +82,7 @@ class LogoutView(View):
         return HttpResponseRedirect(reverse('login'))
 
 
-class UserView(LoginRequiredMixin, TemplateView):
+class UserView(LoginRequiredMixin, BreadcrumbMixin, TemplateView):
     template_name = 'system/users/user.html'
 
 

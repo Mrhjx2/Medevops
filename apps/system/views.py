@@ -3,6 +3,7 @@ from django.views.generic.base import View
 from django.views.generic.base import TemplateView
 
 from .mixin import LoginRequiredMixin
+from apps.custom import BreadcrumbMixin
 
 # Create your views here.
 
@@ -13,7 +14,7 @@ from .mixin import LoginRequiredMixin
 #     """
 #     def get(self, request):
 #         return render(request, 'system/system_index.html')
-class SystemView(LoginRequiredMixin, TemplateView):
+class SystemView(LoginRequiredMixin, BreadcrumbMixin, TemplateView):
     """
     system view
     """

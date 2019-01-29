@@ -15,6 +15,7 @@ from django.views.generic import CreateView, UpdateView
 from django.shortcuts import HttpResponse
 from django.http import Http404
 from .system.mixin import LoginRequiredMixin
+from system.models import Menu
 
 
 # class SimpleInfoCreateView(LoginRequiredMixin, CreateView):
@@ -87,3 +88,12 @@ class RbacUpdateView(LoginRequiredMixin, RbacEditViewMixin, RbacGetObjectMixin, 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
+
+
+class BreadcrumbMixin:
+
+    def get_context_data(self, **kwargs):
+        menu = Menu.get_menu_by_request_url(url=self.request.path_info)
+        if menu is not None:
+            kwargs.update(menu)
+        return super().get_context_data(**kwargs)

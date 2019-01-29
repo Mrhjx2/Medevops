@@ -21,7 +21,7 @@ from django.http import Http404
 from .mixin import LoginRequiredMixin
 # from apps.custom import SimpleInfoCreateView
 from .models import Menu
-from apps.custom import RbacCreateView, RbacUpdateView
+from apps.custom import RbacCreateView, RbacUpdateView, BreadcrumbMixin
 # from .forms import MenuForm
 
 
@@ -67,8 +67,9 @@ class MenuCreateView(RbacCreateView):
         return super().get_context_data(**kwargs)
 
 
-class MenuListView(LoginRequiredMixin, ListView):
+class MenuListView(LoginRequiredMixin, BreadcrumbMixin, ListView):
     model = Menu
+
     context_object_name = 'menu_all'
 
 

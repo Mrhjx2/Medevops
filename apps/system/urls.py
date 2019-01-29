@@ -45,7 +45,7 @@ urlpatterns = [
 
     path('rbac/role/', views_role.RoleView.as_view(), name='rbac-role'),
     path('rbac/role/create/', views_role.RoleCreateView.as_view(), name='rbac-role-create'),
-    path('rbac/role/list', views_role.RoleListView.as_view(), name='rbac-role-list'),
+    path('rbac/role/list/', views_role.RoleListView.as_view(), name='rbac-role-list'),
     path('rbac/role/update/', views_role.RoleUpdateView.as_view(), name='rbac-role-update'),
     path('rbac/role/delete/', views_role.RoleDeleteView.as_view(), name='rbac-role-delete'),
     path('rbac/role/role2user/', views_role.Role2UserView.as_view(), name="rbac-role-role2user"),

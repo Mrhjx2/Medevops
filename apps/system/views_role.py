@@ -16,12 +16,12 @@ from django.contrib.auth import get_user_model
 import json
 from .mixin import LoginRequiredMixin
 from .models import Role, Menu
-from apps.custom import RbacCreateView, RbacUpdateView
+from apps.custom import RbacCreateView, RbacUpdateView, BreadcrumbMixin
 
 User = get_user_model()
 
 
-class RoleView(LoginRequiredMixin, TemplateView):
+class RoleView(LoginRequiredMixin, BreadcrumbMixin, TemplateView):
 
     template_name = 'system/role.html'
 

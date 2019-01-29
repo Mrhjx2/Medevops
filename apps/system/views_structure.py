@@ -21,11 +21,12 @@ from django.contrib.auth import get_user_model
 
 from system.models import Structure
 from .forms import StructureForm
+from apps.custom import BreadcrumbMixin
 
 User = get_user_model()
 
 
-class StructureView(LoginRequiredMixin, TemplateView):
+class StructureView(LoginRequiredMixin, BreadcrumbMixin, TemplateView):
     """
     ..
     """

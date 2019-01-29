@@ -161,3 +161,8 @@ SAFE_URL = [r'^/$',
             '/ckeditor/',
             ]
 
+# session timeout
+
+SESSION_COOKIE_AGE = 60 * 20  # session有效时间为20分钟
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 关闭浏览器Cookie失效
+SESSION_SAVE_EVERY_REQUEST = True  # 以上两个配置需要配合这一条才能够生效
